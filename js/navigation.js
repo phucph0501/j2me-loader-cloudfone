@@ -1,7 +1,28 @@
 /**
- * J2ME Loader for KaiOS
- * Navigation and keyboard handling
+ * J2ME Loader for CloudFone
+ * Navigation and keyboard handling optimized for CloudFone platform
  */
+
+// CloudFone device detection
+const CloudFoneDetection = {
+  isCloudFoneDevice() {
+    const userAgent = navigator.userAgent;
+    return userAgent.includes('Cloud Phone') || userAgent.includes('Puffin');
+  },
+  
+  getDeviceModel() {
+    const userAgent = navigator.userAgent;
+    const match = userAgent.match(/Cloud Phone; ([^)]+)\)/);
+    return match ? match[1] : 'Generic';
+  },
+  
+  init() {
+    if (this.isCloudFoneDevice()) {
+      document.body.classList.add('cloudfone-device');
+      console.log('CloudFone device detected:', this.getDeviceModel());
+    }
+  }
+};
 
 // Navigation state
 const navState = {
@@ -141,8 +162,98 @@ function handleDPad(key, screenId) {
     case 'ArrowDown':
       navNext(screenId);
       break;
+    case 'ArrowLeft':
+      // Handle left navigation if needed
+      break;
+    case 'ArrowRight':
+      // Handle right navigation if needed
+      break;
     case 'Enter':
       activateFocused(screenId);
+      break;
+  }
+}
+
+// CloudFone Soft Key Management
+const SoftKeys = {
+  update(leftText = '', centerText = '', rightText = '') {
+    const leftKey = document.getElementById('softkey-left');
+    const centerKey = document.getElementById('softkey-center');
+    const rightKey = document.getElementById('softkey-right');
+    
+    if (leftKey) leftKey.textContent = leftText;
+    if (centerKey) centerKey.textContent = centerText;
+    if (rightKey) rightKey.textContent = rightText;
+  },
+  
+  setActions(leftAction = null, centerAction = null, rightAction = null) {
+    this.leftAction = leftAction;
+    this.centerAction = centerAction;
+    this.rightAction = rightAction;
+  },
+  
+  handleSoftKeyPress(position) {
+    switch (position) {
+      case 'left':
+        if (this.leftAction) this.leftAction();
+        break;
+      case 'center':
+        if (this.centerAction) this.centerAction();
+        break;
+      case 'right':
+        if (this.rightAction) this.rightAction();
+        break;
+    }
+  }
+};
+
+// CloudFone Keyboard Event Handler
+function handleCloudFoneKeyboard(event) {
+  const key = event.key;
+  const activeScreen = document.querySelector('.screen.active');
+  const screenId = activeScreen ? activeScreen.id : null;
+  
+  // Prevent default for navigation keys
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(key)) {
+    event.preventDefault();
+  }
+  
+  // Handle CloudFone specific keys
+  switch (key) {
+    case 'ArrowUp':
+    case 'ArrowDown':
+    case 'ArrowLeft':
+    case 'ArrowRight':
+    case 'Enter':
+      handleDPad(key, screenId);
+      break;
+    case 'Escape':
+    case 'Backspace':
+      // Handle back navigation
+      SoftKeys.handleSoftKeyPress('right');
+      break;
+    case 'F1':
+    case 'ContextMenu':
+      // Left soft key
+      SoftKeys.handleSoftKeyPress('left');
+      break;
+    case 'F2':
+      // Center soft key (Enter alternative)
+      SoftKeys.handleSoftKeyPress('center');
+      break;
+    // Handle T9 keys (0-9, *, #)
+    case 'Digit0':
+    case 'Digit1':
+    case 'Digit2':
+    case 'Digit3':
+    case 'Digit4':
+    case 'Digit5':
+    case 'Digit6':
+    case 'Digit7':
+    case 'Digit8':
+    case 'Digit9':
+    case 'NumpadMultiply':
+      // Handle T9 input if needed
       break;
   }
 }
@@ -156,3 +267,27 @@ window.Navigation = {
   activate: activateFocused,
   handleDPad: handleDPad
 };
+
+window.SoftKeys = SoftKeys;
+window.CloudFoneDetection = CloudFoneDetection;
+
+// Initialize CloudFone detection and keyboard handling
+document.addEventListener('DOMContentLoaded', () => {
+  CloudFoneDetection.init();
+  
+  // Add CloudFone keyboard event listener
+  document.addEventListener('keydown', handleCloudFoneKeyboard);
+  
+  // Add soft key click handlers
+  document.getElementById('softkey-left')?.addEventListener('click', () => {
+    SoftKeys.handleSoftKeyPress('left');
+  });
+  
+  document.getElementById('softkey-center')?.addEventListener('click', () => {
+    SoftKeys.handleSoftKeyPress('center');
+  });
+  
+  document.getElementById('softkey-right')?.addEventListener('click', () => {
+    SoftKeys.handleSoftKeyPress('right');
+  });
+});

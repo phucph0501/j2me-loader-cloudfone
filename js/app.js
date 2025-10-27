@@ -1,6 +1,6 @@
 /**
- * J2ME Loader for KaiOS
- * Main application logic
+ * J2ME Loader for CloudFone Platform
+ * Main application logic - Optimized for CloudFone devices
  */
 
 // App state
@@ -11,7 +11,8 @@ const appState = {
   selectedAppIndex: -1,
   currentPath: '/sdcard/',
   isInitialized: false,
-  isLoading: false
+  isLoading: false,
+  isCloudFoneDevice: false
 };
 
 // DOM Elements
@@ -40,7 +41,13 @@ const elements = {
 
 // Initialize the application
 function initApp() {
-  console.log('Initializing J2ME Loader for KaiOS');
+  console.log('Initializing J2ME Loader for CloudFone Platform');
+  
+  // Detect CloudFone device
+  if (window.CloudFoneDetection) {
+    appState.isCloudFoneDevice = window.CloudFoneDetection.isCloudFoneDevice();
+    console.log('CloudFone device:', appState.isCloudFoneDevice);
+  }
   
   showLoading('Initializing...');
   
@@ -68,11 +75,24 @@ function initApp() {
   .then(() => {
     // Update softkeys for initial screen
     updateSoftkeys();
+    
+    // Initialize CloudFone navigation
+    if (appState.isCloudFoneDevice && window.Navigation) {
+      window.Navigation.init(appState.currentScreen);
+    }
+    
     hideLoading();
   })
   .catch(error => {
     console.error('Initialization error:', error);
-    alert(`Failed to initialize: ${error.message}`);
+    
+    if (appState.isCloudFoneDevice && window.SoftKeys) {
+      window.SoftKeys.update('', 'Error', 'Retry');
+      window.SoftKeys.setActions(null, null, () => location.reload());
+    } else {
+      alert(`Failed to initialize: ${error.message}`);
+    }
+    
     hideLoading();
   });
 }
@@ -423,36 +443,86 @@ function navigateToScreen(screenId) {
 
 // Update softkey labels based on current screen
 function updateSoftkeys() {
-  switch (appState.currentScreen) {
-    case 'app-list':
-      elements.softkeyLeft.textContent = 'Install';
-      elements.softkeyCenter.textContent = appState.appList.length > 0 ? 'Open' : '';
-      elements.softkeyRight.textContent = 'Exit';
-      break;
-    case 'app-details':
-      elements.softkeyLeft.textContent = '';
-      elements.softkeyCenter.textContent = 'Run';
-      elements.softkeyRight.textContent = 'Back';
-      break;
-    case 'app-settings':
-      elements.softkeyLeft.textContent = '';
-      elements.softkeyCenter.textContent = 'Save';
-      elements.softkeyRight.textContent = 'Back';
-      break;
-    case 'emulator-screen':
-      elements.softkeyLeft.textContent = 'Menu';
-      elements.softkeyCenter.textContent = 'Select';
-      elements.softkeyRight.textContent = 'Back';
-      break;
-    case 'file-browser':
-      elements.softkeyLeft.textContent = '';
-      elements.softkeyCenter.textContent = 'Select';
-      elements.softkeyRight.textContent = 'Back';
-      break;
-    default:
-      elements.softkeyLeft.textContent = '';
-      elements.softkeyCenter.textContent = '';
-      elements.softkeyRight.textContent = 'Back';
+  // For CloudFone devices, use SoftKeys API
+  if (appState.isCloudFoneDevice && window.SoftKeys) {
+    switch (appState.currentScreen) {
+      case 'app-list':
+        window.SoftKeys.update('Install', appState.appList.length > 0 ? 'Open' : '', 'Exit');
+        window.SoftKeys.setActions(
+          () => openFileBrowser(),
+          () => appState.appList.length > 0 && openAppDetails(),
+          () => exitApp()
+        );
+        break;
+      case 'app-details':
+        window.SoftKeys.update('', 'Run', 'Back');
+        window.SoftKeys.setActions(
+          null,
+          () => runSelectedApp(),
+          () => showScreen('app-list')
+        );
+        break;
+      case 'app-settings':
+        window.SoftKeys.update('', 'Save', 'Back');
+        window.SoftKeys.setActions(
+          null,
+          () => saveAppSettings(),
+          () => showScreen('app-details')
+        );
+        break;
+      case 'emulator-screen':
+        window.SoftKeys.update('Menu', 'Select', 'Back');
+        window.SoftKeys.setActions(
+          () => toggleEmulatorMenu(),
+          () => EmulatorCore.handleSelect(),
+          () => stopEmulator()
+        );
+        break;
+      case 'file-browser':
+        window.SoftKeys.update('', 'Select', 'Back');
+        window.SoftKeys.setActions(
+          null,
+          () => FileBrowser.selectCurrentFile(),
+          () => showScreen('app-list')
+        );
+        break;
+      default:
+        window.SoftKeys.update('', '', 'Back');
+        window.SoftKeys.setActions(null, null, () => showScreen('app-list'));
+    }
+  } else {
+    // Fallback for non-CloudFone devices
+    switch (appState.currentScreen) {
+      case 'app-list':
+        elements.softkeyLeft.textContent = 'Install';
+        elements.softkeyCenter.textContent = appState.appList.length > 0 ? 'Open' : '';
+        elements.softkeyRight.textContent = 'Exit';
+        break;
+      case 'app-details':
+        elements.softkeyLeft.textContent = '';
+        elements.softkeyCenter.textContent = 'Run';
+        elements.softkeyRight.textContent = 'Back';
+        break;
+      case 'app-settings':
+        elements.softkeyLeft.textContent = '';
+        elements.softkeyCenter.textContent = 'Save';
+        elements.softkeyRight.textContent = 'Back';
+        break;
+      case 'emulator-screen':
+        elements.softkeyLeft.textContent = 'Menu';
+        elements.softkeyCenter.textContent = 'Select';
+        elements.softkeyRight.textContent = 'Back';
+        break;
+      case 'file-browser':
+        elements.softkeyLeft.textContent = '';
+        elements.softkeyCenter.textContent = 'Select';
+        elements.softkeyRight.textContent = 'Back';
+        break;
+      default:
+        elements.softkeyLeft.textContent = '';
+        elements.softkeyCenter.textContent = '';
+        elements.softkeyRight.textContent = 'Back';
+    }
   }
 }
 

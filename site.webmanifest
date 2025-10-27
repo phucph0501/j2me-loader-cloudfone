@@ -1,10 +1,12 @@
 {
-  "name": "J2ME Loader",
+  "name": "J2ME Loader for CloudFone",
   "short_name": "J2ME Loader",
+  "description": "Java ME applications loader optimized for CloudFone platform",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#0061e0",
+  "theme_color": "#0061e0",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icons/icon-80.png",

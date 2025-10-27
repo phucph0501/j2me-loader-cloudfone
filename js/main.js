@@ -1,6 +1,6 @@
 /**
- * J2ME Loader for KaiOS
- * Main entry point
+ * J2ME Loader for CloudFone
+ * Main entry point - Optimized for CloudFone platform
  */
 
 // Import modules
@@ -15,91 +15,63 @@ window.Database = Database;
 window.FileBrowser = FileBrowser;
 window.EmulatorCore = EmulatorCore;
 
-// Navigation helper for KaiOS
-window.Navigation = {
-  currentIndex: 0,
-  elements: [],
+// CloudFone Platform Detection and Setup
+const CloudFonePlatform = {
+  init() {
+    console.log('J2ME Loader for CloudFone starting up...');
+    
+    // Detect CloudFone device
+    if (window.CloudFoneDetection && window.CloudFoneDetection.isCloudFoneDevice()) {
+      const deviceModel = window.CloudFoneDetection.getDeviceModel();
+      console.log('CloudFone device detected:', deviceModel);
+      
+      // Set up CloudFone specific configurations
+      this.setupCloudFoneFeatures();
+    } else {
+      console.log('Running on standard web browser');
+    }
+    
+    // Initialize application
+    this.loadApplication();
+  },
   
-  init: function(screenId) {
-    // Get all focusable elements in the current screen
-    const screen = document.getElementById(screenId);
-    if (!screen) return;
+  setupCloudFoneFeatures() {
+    // Enable Wake Lock for CloudFone devices
+    if ('wakeLock' in navigator) {
+      navigator.wakeLock.request('screen').catch(err => {
+        console.log('Wake lock not supported:', err);
+      });
+    }
     
-    this.elements = Array.from(screen.querySelectorAll('button, select, input, a, [tabindex="0"]'));
-    this.currentIndex = 0;
-    
-    // Focus the first element if available
-    if (this.elements.length > 0) {
-      this.elements[0].focus();
+    // Optimize for small screens
+    this.optimizeForSmallScreen();
+  },
+  
+  optimizeForSmallScreen() {
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+      viewport.content = 'width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0';
     }
   },
   
-  navigate: function(direction) {
-    if (this.elements.length === 0) return;
-    
-    if (direction === 'up' || direction === 'left') {
-      this.currentIndex = (this.currentIndex - 1 + this.elements.length) % this.elements.length;
-    } else if (direction === 'down' || direction === 'right') {
-      this.currentIndex = (this.currentIndex + 1) % this.elements.length;
-    }
-    
-    this.elements[this.currentIndex].focus();
+  loadApplication() {
+    // Load the application script
+    const appScript = document.createElement('script');
+    appScript.src = 'js/app.js';
+    appScript.onerror = function() {
+      console.error('Failed to load app.js');
+      if (window.SoftKeys) {
+        window.SoftKeys.update('', 'Error', 'Retry');
+        window.SoftKeys.setActions(null, null, () => location.reload());
+      }
+    };
+    document.body.appendChild(appScript);
   }
 };
 
-// Detect KaiOS version and capabilities
-function detectKaiOSVersion() {
-  const userAgent = navigator.userAgent;
-  let version = 'unknown';
-  
-  if (userAgent.includes('KAIOS')) {
-    // Extract version number
-    const match = userAgent.match(/KAIOS\/(\d+\.\d+)/);
-    if (match && match[1]) {
-      version = match[1];
-    }
-  }
-  
-  console.log(`Detected KaiOS version: ${version}`);
-  return version;
-}
-
-// Check for required permissions
-function checkPermissions() {
-  if (navigator.getDeviceStorage) {
-    const storage = navigator.getDeviceStorage('sdcard');
-    if (!storage) {
-      console.warn('Device storage access is not available');
-      return false;
-    }
-    return true;
-  } else {
-    console.warn('Device storage API is not available');
-    return false;
-  }
-}
-
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('J2ME Loader for KaiOS starting up...');
-  
-  // Detect KaiOS version
-  const kaiOSVersion = detectKaiOSVersion();
-  
-  // Check permissions
-  const hasPermissions = checkPermissions();
-  if (!hasPermissions) {
-    alert('This application requires access to device storage. Please grant the necessary permissions in the device settings.');
-  }
-  
-  // Load the application script
-  const appScript = document.createElement('script');
-  appScript.src = 'js/app.js';
-  appScript.onerror = function() {
-    console.error('Failed to load app.js');
-    alert('Failed to initialize the application. Please try again.');
-  };
-  document.body.appendChild(appScript);
+  CloudFonePlatform.init();
 });
 
 // Handle global errors

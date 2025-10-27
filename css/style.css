@@ -14,6 +14,37 @@ html, body {
   overflow: hidden;
 }
 
+/* CloudFone specific styles */
+@media screen and (max-width: 320px) {
+  html, body {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 240px) {
+  html, body {
+    font-size: 10px;
+  }
+}
+
+@media screen and (max-width: 160px) {
+  html, body {
+    font-size: 8px;
+  }
+}
+
+/* CloudFone keyboard navigation focus styles */
+.focusable {
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+.focusable:focus,
+.focusable.focused {
+  background-color: #e3f2fd !important;
+  border: 2px solid #2196f3 !important;
+}
+
 #app {
   display: flex;
   flex-direction: column;
@@ -278,11 +309,18 @@ input[type="checkbox"]:focus {
   padding: 0 5px;
   font-size: 14px;
   line-height: 30px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
 #softkey-left, #softkey-center, #softkey-right {
   flex: 1;
   text-align: center;
+  cursor: pointer;
+  padding: 0 5px;
 }
 
 #softkey-left {
@@ -291,4 +329,79 @@ input[type="checkbox"]:focus {
 
 #softkey-right {
   text-align: right;
+}
+
+/* CloudFone Device Detection */
+.cloudfone-device #content {
+  padding-bottom: 30px; /* Make room for soft keys */
+}
+
+/* CloudFone small screen optimizations */
+@media screen and (max-width: 320px) {
+  #header h1 {
+    font-size: 14px;
+  }
+  
+  .nav-list li {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  #softkeys {
+    font-size: 12px;
+    height: 25px;
+    line-height: 25px;
+  }
+}
+
+@media screen and (max-width: 240px) {
+  #header {
+    height: 25px;
+    padding: 3px 8px;
+  }
+  
+  #header h1 {
+    font-size: 12px;
+  }
+  
+  .nav-list li {
+    padding: 6px;
+    font-size: 10px;
+  }
+  
+  #softkeys {
+    font-size: 10px;
+    height: 20px;
+    line-height: 20px;
+  }
+  
+  .cloudfone-device #content {
+    padding-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: 160px) {
+  #header {
+    height: 20px;
+    padding: 2px 5px;
+  }
+  
+  #header h1 {
+    font-size: 10px;
+  }
+  
+  .nav-list li {
+    padding: 4px;
+    font-size: 8px;
+  }
+  
+  #softkeys {
+    font-size: 8px;
+    height: 18px;
+    line-height: 18px;
+  }
+  
+  .cloudfone-device #content {
+    padding-bottom: 18px;
+  }
 }

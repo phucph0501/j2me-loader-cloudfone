@@ -2,8 +2,10 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>J2ME Loader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>J2ME Loader for CloudFone</title>
+  <meta name="description" content="J2ME Loader optimized for CloudFone platform">
+  <meta name="theme-color" content="#0061e0">
   <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="site.webmanifest">
 </head>
@@ -18,7 +20,7 @@
         <div class="list-container">
           <ul id="apps" class="nav-list">
             <!-- Apps will be listed here -->
-            <li class="no-apps">No applications found</li>
+            <li class="no-apps focusable" tabindex="0">No applications found</li>
           </ul>
         </div>
       </div>
@@ -29,9 +31,9 @@
           <h2 id="app-name"></h2>
           <p id="app-info"></p>
           <div class="button-container">
-            <button id="run-app" class="primary-btn">Run</button>
-            <button id="settings-app" class="secondary-btn">Settings</button>
-            <button id="delete-app" class="danger-btn">Delete</button>
+            <button id="run-app" class="primary-btn focusable" tabindex="0">Run</button>
+            <button id="settings-app" class="secondary-btn focusable" tabindex="0">Settings</button>
+            <button id="delete-app" class="danger-btn focusable" tabindex="0">Delete</button>
           </div>
         </div>
       </div>
@@ -42,7 +44,7 @@
           <form id="settings-form">
             <div class="form-group">
               <label for="screen-size">Screen Size:</label>
-              <select id="screen-size" name="screen-size">
+              <select id="screen-size" name="screen-size" class="focusable" tabindex="0">
                 <option value="original">Original</option>
                 <option value="stretched">Stretched</option>
                 <option value="scaled">Scaled</option>
