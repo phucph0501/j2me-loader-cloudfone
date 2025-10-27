@@ -47,12 +47,29 @@ function initApp() {
   if (window.CloudFoneDetection) {
     appState.isCloudFoneDevice = window.CloudFoneDetection.isCloudFoneDevice();
     console.log('CloudFone device:', appState.isCloudFoneDevice);
+    
+    if (appState.isCloudFoneDevice) {
+      console.log('CloudFone device model:', window.CloudFoneDetection.getDeviceModel());
+      console.log('User Agent:', navigator.userAgent);
+    }
   }
   
   showLoading('Initializing...');
   
   // Set up event listeners
   document.addEventListener('keydown', handleKeyDown);
+  
+  // Add CloudFone specific keyboard debugging
+  if (appState.isCloudFoneDevice) {
+    document.addEventListener('keydown', (e) => {
+      console.log('CloudFone Key Debug:', {
+        key: e.key,
+        keyCode: e.keyCode,
+        which: e.which,
+        code: e.code
+      });
+    });
+  }
   
   // Button event listeners
   elements.runAppBtn.addEventListener('click', runSelectedApp);
@@ -459,7 +476,7 @@ function updateSoftkeys() {
         window.SoftKeys.setActions(
           null,
           () => runSelectedApp(),
-          () => showScreen('app-list')
+          () => navigateToScreen('app-list')
         );
         break;
       case 'app-settings':
@@ -467,7 +484,7 @@ function updateSoftkeys() {
         window.SoftKeys.setActions(
           null,
           () => saveAppSettings(),
-          () => showScreen('app-details')
+          () => navigateToScreen('app-details')
         );
         break;
       case 'emulator-screen':
@@ -483,12 +500,12 @@ function updateSoftkeys() {
         window.SoftKeys.setActions(
           null,
           () => FileBrowser.selectCurrentFile(),
-          () => showScreen('app-list')
+          () => navigateToScreen('app-list')
         );
         break;
       default:
         window.SoftKeys.update('', '', 'Back');
-        window.SoftKeys.setActions(null, null, () => showScreen('app-list'));
+        window.SoftKeys.setActions(null, null, () => navigateToScreen('app-list'));
     }
   } else {
     // Fallback for non-CloudFone devices
@@ -531,7 +548,13 @@ function handleKeyDown(e) {
   // Skip if loading
   if (appState.isLoading) return;
   
-  console.log(`Key pressed: ${e.key}`);
+  console.log(`Key pressed: ${e.key}, keyCode: ${e.keyCode}`);
+  
+  // For CloudFone devices, use the CloudFone navigation system
+  if (appState.isCloudFoneDevice && window.Navigation) {
+    // Let CloudFone navigation handle the keys
+    return;
+  }
   
   // Handle emulator screen keys separately
   if (appState.currentScreen === 'emulator-screen') {
@@ -546,6 +569,7 @@ function handleKeyDown(e) {
     return;
   }
   
+  // Handle standard keys
   switch (e.key) {
     case 'ArrowUp':
       handleArrowUp();
@@ -568,32 +592,112 @@ function handleKeyDown(e) {
       e.preventDefault();
       break;
     case 'Backspace':
+    case 'Escape':
       handleBackspace();
       e.preventDefault();
       break;
     case 'SoftLeft':
     case 'F1':
+    case 'ContextMenu':
       handleSoftLeft();
       e.preventDefault();
       break;
     case 'SoftRight':
     case 'F2':
-    case 'Escape':
       handleSoftRight();
       e.preventDefault();
       break;
+    // Handle T9 numeric keys for CloudFone
+    case 'Digit1':
+    case '1':
+      handleNumericKey('1');
+      break;
+    case 'Digit2':
+    case '2':
+      handleNumericKey('2');
+      break;
+    case 'Digit3':
+    case '3':
+      handleNumericKey('3');
+      break;
+    case 'Digit4':
+    case '4':
+      handleNumericKey('4');
+      break;
+    case 'Digit5':
+    case '5':
+      handleNumericKey('5');
+      break;
+    case 'Digit6':
+    case '6':
+      handleNumericKey('6');
+      break;
+    case 'Digit7':
+    case '7':
+      handleNumericKey('7');
+      break;
+    case 'Digit8':
+    case '8':
+      handleNumericKey('8');
+      break;
+    case 'Digit9':
+    case '9':
+      handleNumericKey('9');
+      break;
+    case 'Digit0':
+    case '0':
+      handleNumericKey('0');
+      break;
+    case 'NumpadMultiply':
+    case '*':
+      handleNumericKey('*');
+      break;
+    case '#':
+      handleNumericKey('#');
+      break;
+  }
+}
+
+// Handle numeric keys (T9 keypad)
+function handleNumericKey(key) {
+  // For CloudFone T9 input or quick navigation
+  switch (appState.currentScreen) {
+    case 'app-list':
+      // Quick app selection by number
+      const appIndex = parseInt(key) - 1;
+      if (appIndex >= 0 && appIndex < appState.appList.length) {
+        selectApp(appIndex);
+      }
+      break;
+    case 'emulator-screen':
+      // Pass to emulator
+      if (EmulatorCore && EmulatorCore.handleKeyDown) {
+        EmulatorCore.handleKeyDown(key);
+      }
+      break;
+    // Add more cases as needed
   }
 }
 
 // Handle emulator keys
 function handleEmulatorKeys(e) {
-  // Map KaiOS keys to J2ME keys
+  // CloudFone compatible key mapping for J2ME
   const keyMap = {
     'ArrowUp': 'UP',
     'ArrowDown': 'DOWN',
     'ArrowLeft': 'LEFT',
     'ArrowRight': 'RIGHT',
     'Enter': 'SELECT',
+    'Digit1': '1',
+    'Digit2': '2',
+    'Digit3': '3',
+    'Digit4': '4',
+    'Digit5': '5',
+    'Digit6': '6',
+    'Digit7': '7',
+    'Digit8': '8',
+    'Digit9': '9',
+    'Digit0': '0',
     '1': '1',
     '2': '2',
     '3': '3',
@@ -603,28 +707,30 @@ function handleEmulatorKeys(e) {
     '7': '7',
     '8': '8',
     '9': '9',
-    '*': 'STAR',
     '0': '0',
+    'NumpadMultiply': 'STAR',
+    '*': 'STAR',
     '#': 'POUND'
   };
   
-  // Handle softkeys
-  if (e.key === 'SoftRight' || e.key === 'F2' || e.key === 'Escape') {
+  // Handle CloudFone soft keys
+  if (e.key === 'SoftRight' || e.key === 'F2' || e.key === 'Escape' || e.key === 'Backspace') {
     stopEmulation();
     navigateToScreen('app-details');
     e.preventDefault();
     return;
   }
   
-  if (e.key === 'SoftLeft' || e.key === 'F1') {
-    // Show emulator menu (not implemented yet)
+  if (e.key === 'SoftLeft' || e.key === 'F1' || e.key === 'ContextMenu') {
+    // Show emulator menu
+    toggleEmulatorMenu();
     e.preventDefault();
     return;
   }
   
-  // Map key to J2ME key
+  // Map key to J2ME key and send to emulator
   const j2meKey = keyMap[e.key];
-  if (j2meKey) {
+  if (j2meKey && EmulatorCore && EmulatorCore.handleKeyDown) {
     EmulatorCore.handleKeyDown(j2meKey);
     e.preventDefault();
   }
@@ -784,6 +890,46 @@ function handleSoftRight() {
       stopEmulation();
       navigateToScreen('app-details');
       break;
+  }
+}
+
+// CloudFone specific functions
+function exitApp() {
+  if (confirm('Exit J2ME Loader?')) {
+    if (window.close) {
+      window.close();
+    } else {
+      // For CloudFone, try to go back or show exit message
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        alert('Press the End Call key to exit');
+      }
+    }
+  }
+}
+
+function stopEmulator() {
+  if (EmulatorCore && EmulatorCore.stop) {
+    EmulatorCore.stop()
+      .then(() => {
+        console.log('Emulator stopped');
+        navigateToScreen('app-details');
+      })
+      .catch(error => {
+        console.error('Failed to stop emulator', error);
+        navigateToScreen('app-details');
+      });
+  } else {
+    navigateToScreen('app-details');
+  }
+}
+
+function toggleEmulatorMenu() {
+  // Toggle emulator menu (placeholder)
+  console.log('Emulator menu toggled');
+  if (EmulatorCore && EmulatorCore.toggleMenu) {
+    EmulatorCore.toggleMenu();
   }
 }
 
