@@ -11,7 +11,7 @@ A web-based J2ME (Java ME) emulator that allows you to run classic mobile Java a
 
 ## Live Demo
 
-Visit the live demo: [https://yourusername.github.io/j2me-loader-cloudfone](https://yourusername.github.io/j2me-loader-cloudfone)
+Visit the live demo: [https://phucph0501.github.io/j2me-loader-cloudfone](https://phucph0501.github.io/j2me-loader-cloudfone)
 
 ## Usage
 
@@ -24,7 +24,7 @@ Visit the live demo: [https://yourusername.github.io/j2me-loader-cloudfone](http
 Simply clone this repository and open `index.html` in your web browser, or host it on any web server.
 
 ```bash
-git clone https://github.com/yourusername/j2me-loader-cloudfone.git
+git clone https://github.com/phucph0501/j2me-loader-cloudfone.git
 cd j2me-loader-cloudfone
 # Open index.html in your browser
 ```
