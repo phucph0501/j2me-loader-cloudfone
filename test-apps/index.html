@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J2ME Test Apps for CloudFone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .app-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .app-title {
+            color: #0061e0;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .download-btn {
+            background-color: #0061e0;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .download-btn:hover {
+            background-color: #0052cc;
+        }
+        
+        .install-instructions {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #0061e0;
+        }
+        
+        .kbd {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>J2ME Test Applications</h1>
+    <p>Test applications designed for CloudFone platform and J2ME Loader</p>
+    
+    <div class="install-instructions">
+        <h3>How to install:</h3>
+        <ol>
+            <li>Download a JAR file by clicking the download button</li>
+            <li>Open your J2ME Loader application</li>
+            <li>Click "Install" or use left soft key</li>
+            <li>Browse and select the downloaded JAR file</li>
+            <li>Follow installation prompts</li>
+            <li>Run the application and test keyboard functions</li>
+        </ol>
+    </div>
+    
+    <div class="app-card">
+        <div class="app-title">Hello World Test</div>
+        <p><strong>Description:</strong> Simple Hello World application to test basic functionality</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>Basic UI display</li>
+            <li>Command handling</li>
+            <li>Exit functionality</li>
+        </ul>
+        <p><strong>Keyboard:</strong> <span class="kbd">Escape</span> to exit</p>
+        <a href="#" class="download-btn" onclick="downloadHelloWorld()">Download HelloWorld.jar</a>
+    </div>
+    
+    <div class="app-card">
+        <div class="app-title">Simple Game Test</div>
+        <p><strong>Description:</strong> Interactive game to test CloudFone keyboard input</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>Arrow key movement</li>
+            <li>T9 keypad detection</li>
+            <li>Real-time key display</li>
+            <li>Game loop with graphics</li>
+        </ul>
+        <p><strong>Keyboard:</strong> 
+            <span class="kbd">↑↓←→</span> to move, 
+            <span class="kbd">0-9</span> numbers, 
+            <span class="kbd">*</span> <span class="kbd">#</span> special keys
+        </p>
+        <a href="#" class="download-btn" onclick="downloadGame()">Download SimpleGame.jar</a>
+    </div>
+    
+    <div class="app-card">
+        <div class="app-title">CloudFone Test Suite</div>
+        <p><strong>Description:</strong> Comprehensive test for CloudFone-specific features</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>Device detection</li>
+            <li>Screen size testing</li>
+            <li>Soft key handling</li>
+            <li>Focus management</li>
+        </ul>
+        <p><strong>Status:</strong> <em>Coming soon...</em></p>
+    </div>
+    
+    <div class="install-instructions">
+        <h3>CloudFone Platform Testing:</h3>
+        <p>These apps are specifically designed to test CloudFone compatibility:</p>
+        <ul>
+            <li><strong>Device Detection:</strong> Apps detect CloudFone devices</li>
+            <li><strong>Keyboard Mapping:</strong> Proper handling of CloudFone keys</li>
+            <li><strong>Screen Sizes:</strong> Support for QQVGA (128x160) and QVGA (240x320)</li>
+            <li><strong>Soft Keys:</strong> Left/Right soft key functionality</li>
+            <li><strong>T9 Keypad:</strong> Number keys 0-9, *, # support</li>
+        </ul>
+    </div>
+
+    <script>
+        function downloadHelloWorld() {
+            // Create a simple JAR file content (this is a mock - real JAR would need proper compilation)
+            alert('Hello World JAR download would start here.\\n\\nFor real testing, you can:\\n1. Find sample J2ME apps online\\n2. Use existing JAR files\\n3. Upload to your CloudFone device\\n\\nTry searching for "J2ME games download" or use apps from:\\n- Archive.org mobile software\\n- RetroGaming communities\\n- J2ME preservation projects');
+        }
+        
+        function downloadGame() {
+            alert('Simple Game JAR download would start here.\\n\\nFor testing the keyboard functionality:\\n1. Try any existing J2ME game\\n2. Look for games that use arrow keys\\n3. Test number key input\\n\\nRecommended test apps:\\n- Snake games\\n- Tetris\\n- Simple arcade games');
+        }
+        
+        // Test CloudFone detection
+        function detectCloudFone() {
+            const userAgent = navigator.userAgent;
+            const isCloudFone = userAgent.includes('Cloud Phone') || userAgent.includes('Puffin');
+            
+            if (isCloudFone) {
+                console.log('CloudFone device detected!');
+                console.log('User Agent:', userAgent);
+                return true;
+            } else {
+                console.log('Standard browser detected');
+                console.log('User Agent:', userAgent);
+                return false;
+            }
+        }
+        
+        // Run detection on page load
+        window.addEventListener('load', function() {
+            detectCloudFone();
+            console.log('J2ME Test Apps page loaded');
+        });
+        
+        // Add keyboard event listener for testing
+        document.addEventListener('keydown', function(e) {
+            console.log('Key pressed:', {
+                key: e.key,
+                keyCode: e.keyCode,
+                code: e.code,
+                which: e.which
+            });
+        });
+    </script>
+</body>
+</html>

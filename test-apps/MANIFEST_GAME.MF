@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+MIDlet-Name: Simple Game Test
+MIDlet-Version: 1.0.0
+MIDlet-Vendor: CloudFone Test
+MIDlet-1: Simple Game, /icon.png, SimpleGameMIDlet
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+MIDlet-Description: Keyboard test game for CloudFone platform

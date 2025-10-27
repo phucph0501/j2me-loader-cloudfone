@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+MIDlet-Name: Hello CloudFone
+MIDlet-Version: 1.0.0
+MIDlet-Vendor: J2ME Test
+MIDlet-1: Hello CloudFone, /icon.png, HelloWorldMIDlet
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+MIDlet-Description: Test application for CloudFone platform
